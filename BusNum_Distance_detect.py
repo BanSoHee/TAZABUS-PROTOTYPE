@@ -231,10 +231,11 @@ def run(weights='yolov5s.pt',  # model.pt path(s)
                             Distance = distance_finder(focal_length_found, real_width, delta_y) # 단위 cm
 
                             # 측정한 거리 결과 저장
-                            f = open('detectedBusDistance.txt', 'w')
+                            '''
+                            f = open('detected_BusDistance.txt', 'w')
                             distancedata = 'Distace = {0}cm\n'.format(int(Distance))
                             f.write(distancedata)
-                            f.close
+                            f.close '''
 
                         # 객체 이름, class 번호, bounding box 좌표 출력
                         #print('detected object name = ', object_name)
@@ -285,7 +286,7 @@ def run(weights='yolov5s.pt',  # model.pt path(s)
                 # 인식된 숫자들의 bounding box 좌표를 오름차순으로 정렬 per frame -> 버스 번호 인식
                 for k in range(len(list_x1)):
                     for j in range(len(list_x1)-1):
-                        if list_x1[j] > list_x1[j+1]: # bounding box 좌표를 오름차순으로 정렬
+                        if list_x1[j] > list_x1[j+1]:
                             list_x1[j], list_x1[j+1] = list_x1[j+1], list_x1[j]
                             list_num[j], list_num[j+1] = list_num[j+1], list_num[j]
 
@@ -317,25 +318,27 @@ def run(weights='yolov5s.pt',  # model.pt path(s)
                     bus_num = bus_num + bus_number
 
                 # 인식된 버스 번호를 txt 파일에 저장
-                f = open('‪detectedBusNum.txt', 'w')
+                '''
+                f = open('‪detected_BusNum.txt', 'w')
                 data = '{0}\n'.format(bus_num)
                 if bus_num != '':
                     f.write(data)
-                    f.close
+                    f.close '''
 
-                # 버스와 버스 번호가 인식될 경우, 출력 멘트를 저장
-                if (bus_num != '' and int(Distance) != 0):
+                # 키보드 입력값 존재 + 버스(거리) 인식 + 버스 번호 인식이 모두 되었을 경우 전달할 정보를 음성으로 출력
+                # cv2.waitKey(1) == ord('a')
+                if (cv2.waitKey(1) == ord('a') and bus_num != '' and int(Distance) != 0):  # q to quit, 0.001초만큼 키보드 입력 기다림
+                    
+                    print('{0}번 버스가 {1}cm 앞에 있습니다'.format(bus_num, int(Distance)))
+
+                    # 전달 정보 저장
                     f1 = open('fin_detected_Bus.txt', 'w')
                     fin_data = '{0}번 버스가 {1}cm 앞에 있습니다\n'.format(bus_num, int(Distance))
                     f1.write(fin_data)
                     f1.close
 
-                # 키보드 입력값 존재 + 버스 인식 + 버스 번호 인식이 모두 되었을 경우 전달할 정보를 음성으로 출력
-                # cv2.waitKey(1) == ord('a')
-                if (cv2.waitKey(1) == ord('a') and bus_num != '' and int(Distance) != 0):  # q to quit, 0.001초만큼 키보드 입력 기다림
-                    
-                    print('{0}번 버스가 {1}cm 앞에 있습니다'.format(bus_num, int(Distance)))
-                    tts = gTTS(text = '{0}번 버스가 {1}cm 앞에 있습니다'.format(bus_num, int(Distance)), lang = 'ko', slow = False) 
+                    # with gTTS, text -> speech
+                    tts = gTTS(text = fin_data, lang = 'ko', slow = False) 
                     tts.save('BusgTTS.mp3')
 
                     pygame.mixer.init(freq, bitsize, channels, buffer)
