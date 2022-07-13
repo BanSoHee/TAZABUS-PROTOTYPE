@@ -1,4 +1,4 @@
-# TAZABUS-PROTOTYPE
+# TazaBus-prototype
 <!--Artificial Intelligence Bus Assistant Prototype for the Blind
 
 
